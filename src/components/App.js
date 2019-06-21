@@ -1,9 +1,13 @@
 import React from 'react';
 import Graph from './Graph';
 
+const bodyStyle = {
+  fontFamily: '"DIN Pro", -apple-system, BlinkMacSystemFont, sans-serif'
+};
+
 const App = () => {
   return (
-    <div>
+    <div style={bodyStyle}>
       <Graph />
     </div>
   );

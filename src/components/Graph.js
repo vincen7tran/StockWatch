@@ -12,7 +12,9 @@ class Graph extends React.Component {
   render() {
     console.log(this.props);
     return (
-      <div>Graph</div>
+      <div>
+        aeirgjafdklgjdflgj
+      </div>
     );
   };
 }
