@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { getIntraday, getDaily } from '../actions';
+import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate } from '../actions';
 
 const container = {
   display: 'block',
@@ -46,6 +46,10 @@ const svgStyle = {
   height: '196px',
 }
 
+const lineColor = {
+  color: '#21ce99'
+};
+
 class Graph extends React.Component {
   componentDidMount() {
     const { getIntraday, getDaily } = this.props;
@@ -55,22 +59,30 @@ class Graph extends React.Component {
   }
 
   getMinAndMaxX = () => {
+    const { setMinX, setMaxX, setStartDate } = this.props;
     const today = moment(new Date()).format('YYYY-MM-DD');
     const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
+    const max = moment(today, 'YYYY-MM-DD').diff(moment(oneMonthAgo, 'YYYY-MM-DD'), 'days');
 
+    setMinX(0);
+    setMaxX(max);
+    setStartDate(today);
+    this.getMinAndMaxY(oneMonthAgo, today);
+    
     return {
-      minX: oneMonthAgo,
-      maxX: today,
+      minX: 0,
+      maxX: max,
     };
   }
 
   getMinAndMaxY = (minX, maxX) => {
+    const { setMinY, setMaxY }  = this.props;
     const timeSeries = this.props.daily['Time Series (Daily)'];
+    const start = minX;
+    const end = maxX;
+    let current = start;
     let minY = Infinity;
     let maxY = -Infinity;
-    const start = minX;
-    let current = start;
-    const end = maxX;
 
     while (current < end) {
       if (timeSeries[current]) {
@@ -82,6 +94,9 @@ class Graph extends React.Component {
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
 
+    setMinY(parseFloat(minY));
+    setMaxY(parseFloat(maxY));
+
     return {
       min: minY,
       max: maxY
@@ -89,18 +104,22 @@ class Graph extends React.Component {
   }
 
   getSvgX = x => {
-    const { width } = svgStyle;
+    const { width, xMax } = svgStyle;
+    return (x / xMax * width)
   };
 
   getSvgY = y => {
-    const { height } = svgStyle;
+    const { height, yMax } = svgStyle;
+    return (y / yMax * height);
+  };
+
+  makePath = () => {
+
   };
 
   render() {
     if(this.props.daily) {
-      const x = this.getMinAndMaxX();
-      const y = this.getMinAndMaxY(x.minX, x.maxX);
-      console.log(x, y);
+      this.getMinAndMaxX();
     }
 
     return (
@@ -126,12 +145,25 @@ class Graph extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { daily, intraday } = state;
+  const { daily, intraday, xMin, xMax, yMin, yMax, startDate } = state;
 
   return {
     daily,
     intraday,
+    xMin,
+    xMax,
+    yMin,
+    yMax,
+    startDate
   };
 };
 
-export default connect(mapStateToProps, { getIntraday, getDaily })(Graph);
+export default connect(mapStateToProps, { 
+  getIntraday,
+  getDaily,
+  setMinX,
+  setMaxX,
+  setMinY,
+  setMaxY,
+  setStartDate
+})(Graph);

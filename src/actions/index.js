@@ -12,6 +12,41 @@ export const selectStock = ticker => {
   };
 };
 
+export const setStartDate = date => {
+  return {
+    type: 'SET_STARTDATE',
+    payload: date
+  };
+};
+
+export const setMinX = x => {
+  return {
+    type: 'SET_XMIN',
+    payload: x
+  };
+};
+
+export const setMaxX = x => {
+  return {
+    type: 'SET_XMAX',
+    payload: x
+  };
+};
+
+export const setMinY = y => {
+  return {
+    type: 'SET_YMAX',
+    payload: y
+  };
+};
+
+export const setMaxY = y => {
+  return {
+    type: 'SET_YMIN',
+    payload: y
+  };
+};
+
 export const getIntraday = () => {
   return {
     type: 'FETCH_INTRADAY',
