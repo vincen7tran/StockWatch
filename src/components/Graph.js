@@ -62,22 +62,16 @@ class Graph extends React.Component {
   handleMouseMove = (e) => {
     const { data, setHover } = this.props;
     const el = document.getElementById('graphPath');
-    const coord = el.getPointAtLength(e.clientX).x;
-    let closest = data[0];
-    
-    for (let point of data) {
-      const currentDiff = coord - closest.coords;
-      const checkDiff = Math.abs(coord - point.coords);
+    const rect = el.getBoundingClientRect();
+    const coord = e.clientX - rect.x;
+    const x = coord < 0 ? 0 : Math.round(this.getX(coord));
 
-      if (checkDiff < currentDiff) closest = point;
-    }
-
-    setHover(closest);
+    setHover(data[x]);
   }
 
   clearHover = () => {
     const { setHover } = this.props;
-    
+
     setHover(null);
   }
 
@@ -96,7 +90,7 @@ class Graph extends React.Component {
     
 
     setMinX(0);
-    setMaxX(max);
+    setMaxX(max - 1);
     setStartDate(today);
     if (xMax) this.getMinAndMaxY(oneMonthAgo, today);
     
@@ -140,6 +134,13 @@ class Graph extends React.Component {
     }
   }
 
+  getX = svg => {
+    const { xMax } = this.props;
+    const width = 676;
+
+    return (svg * xMax / width);
+  }
+
   getSvgX = x => {
     const { xMax } = this.props;
     const width = 676;
@@ -173,7 +174,7 @@ class Graph extends React.Component {
   }
 
   makeAxis = () => {
-    const { xMin, xMax, yMin, yMax } = this.props;
+    const { xMin, xMax, yMin, yMax, hoverPoint } = this.props;
 
     return (
       <g style={axisStyle}>
@@ -189,6 +190,16 @@ class Graph extends React.Component {
           x2={this.getSvgX(xMin)}
           y2={this.getSvgY(yMax)}
         />
+        {
+          hoverPoint
+          &&
+        <line
+          x1={hoverPoint.coords}
+          y1={this.getSvgY(yMin)}
+          x2={hoverPoint.coords}
+          y2={this.getSvgY(yMax)}
+        />
+        }
       </g>
     );
   }
@@ -211,12 +222,13 @@ class Graph extends React.Component {
               </h1>
             </header>
             <div style={graphDiv}>
-              {data.length
-              &&
-              <svg id="graph" onMouseLeave={this.clearHover} onMouseMove={e => this.handleMouseMove(e)} viewBox={`0 0 676 196`}>
-                {this.makePath()}
-                {this.makeAxis()}
-              </svg>
+              {
+                data.length
+                &&
+                <svg id="graph" onMouseLeave={this.clearHover} onMouseMove={e => this.handleMouseMove(e)} viewBox={`0 0 676 196`}>
+                  {this.makePath()}
+                  {this.makeAxis()}
+                </svg>
               }
             </div>
           </section>
