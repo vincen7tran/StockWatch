@@ -1,8 +1,8 @@
-export default (state = null, action) => {
+export default (state = [], action) => {
   switch (action.type) {
-    case 'FETCH_DAILY':
+    case 'SET_DATA':
       return action.payload;
     default:
       return state;
-  }
+  };
 };

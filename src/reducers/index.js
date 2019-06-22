@@ -7,6 +7,7 @@ import xMaxReducer from './xMaxReducer';
 import yMinReducer from './yMinReducer';
 import yMaxReducer from './yMaxReducer';
 import startDateReducer from './startDateReducer';
+import dataReducer from './dataReducer';
 
 export default combineReducers({
   intraday: intradayReducer,
@@ -17,4 +18,5 @@ export default combineReducers({
   yMin: yMinReducer,
   yMax: yMaxReducer,
   startDate: startDateReducer,
+  data: dataReducer
 });

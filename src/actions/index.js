@@ -12,6 +12,13 @@ export const selectStock = ticker => {
   };
 };
 
+export const setData = data => {
+  return {
+    type: 'SET_DATA',
+    payload: data
+  };
+};
+
 export const setStartDate = date => {
   return {
     type: 'SET_STARTDATE',
@@ -35,14 +42,14 @@ export const setMaxX = x => {
 
 export const setMinY = y => {
   return {
-    type: 'SET_YMAX',
+    type: 'SET_YMIN',
     payload: y
   };
 };
 
 export const setMaxY = y => {
   return {
-    type: 'SET_YMIN',
+    type: 'SET_YMAX',
     payload: y
   };
 };

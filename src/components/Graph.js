@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate } from '../actions';
+import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setData } from '../actions';
 
 const container = {
   display: 'block',
@@ -42,12 +42,13 @@ const graphDiv = {
 };
 
 const svgStyle = {
-  width: '676px',
-  height: '196px',
-}
+  stroke: '#21ce99',
+  strokeWidth: '2',
+  fill: 'none',
+};
 
-const lineColor = {
-  color: '#21ce99'
+const axisStyle = {
+  stroke: '#1b1b1d'
 };
 
 class Graph extends React.Component {
@@ -76,13 +77,15 @@ class Graph extends React.Component {
   }
 
   getMinAndMaxY = (minX, maxX) => {
-    const { setMinY, setMaxY }  = this.props;
+    const { setMinY, setMaxY, setData }  = this.props;
     const timeSeries = this.props.daily['Time Series (Daily)'];
     const start = minX;
     const end = maxX;
+    const data = [];
     let current = start;
     let minY = Infinity;
     let maxY = -Infinity;
+    let x = 0;
 
     while (current < end) {
       if (timeSeries[current]) {
@@ -90,10 +93,17 @@ class Graph extends React.Component {
 
         if (value < minY) minY = value;
         else if (value > maxY) maxY = value;
+        data.push({
+          x,
+          y: value,
+          date: current 
+        });
+        x++;
       }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
 
+    setData(data);
     setMinY(parseFloat(minY));
     setMaxY(parseFloat(maxY));
 
@@ -104,23 +114,56 @@ class Graph extends React.Component {
   }
 
   getSvgX = x => {
-    const { width, xMax } = svgStyle;
-    return (x / xMax * width)
+    const { xMax } = this.props;
+    const width = 676;
+    return (x / xMax * width);
   };
 
   getSvgY = y => {
-    const { height, yMax } = svgStyle;
-    return (y / yMax * height);
+    const { yMax } = this.props;
+    const height = 196;
+    return height - (y / yMax * height);
   };
 
   makePath = () => {
+    const { data } = this.props;
 
+    let pathD = `M ${this.getSvgX(data[0].x)} ${this.getSvgY(data[0].y)}`;
+
+    pathD += data.map((point, i) => {
+      return `L ${this.getSvgX(point.x)} ${this.getSvgY(point.y)}`;
+    });
+
+    return (
+      <path d={pathD} style={svgStyle} width="676" height="196" />
+    );
+  };
+
+  makeAxis = () => {
+    const { xMin, xMax, yMin, yMax } = this.props;
+
+    return (
+      <g style={axisStyle}>
+        <line
+          x1={this.getSvgX(xMin)}
+          y1={this.getSvgY(yMin)}
+          x2={this.getSvgX(xMax)}
+          y2={this.getSvgY(yMin)}
+        />
+        <line
+          x1={this.getSvgX(xMin)}
+          y1={this.getSvgY(yMin)}
+          x2={this.getSvgX(xMin)}
+          y2={this.getSvgY(yMax)}
+        />
+      </g>
+    )
   };
 
   render() {
-    if(this.props.daily) {
-      this.getMinAndMaxX();
-    }
+    const { daily, data } = this.props;
+
+    if (daily && !data.length) this.getMinAndMaxX();
 
     return (
       <div style={container}>
@@ -129,13 +172,19 @@ class Graph extends React.Component {
         </header>
         <div>
           <section style={graphSection}>
-            <header className={priceHeader}>
+            <header style={priceHeader}>
               <h1 style={priceH1}>
                 $123.12
               </h1>
             </header>
             <div style={graphDiv}>
-
+              {data.length
+              &&
+              <svg viewBox={`0 0 676 196`}>
+                {this.makePath()}
+                {this.makeAxis()}
+              </svg>
+              }
             </div>
           </section>
         </div>
@@ -145,7 +194,7 @@ class Graph extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { daily, intraday, xMin, xMax, yMin, yMax, startDate } = state;
+  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, data } = state;
 
   return {
     daily,
@@ -154,7 +203,8 @@ const mapStateToProps = state => {
     xMax,
     yMin,
     yMax,
-    startDate
+    startDate,
+    data,
   };
 };
 
@@ -165,5 +215,6 @@ export default connect(mapStateToProps, {
   setMaxX,
   setMinY,
   setMaxY,
-  setStartDate
+  setStartDate,
+  setData,
 })(Graph);
