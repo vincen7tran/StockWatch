@@ -7,7 +7,7 @@ import intraday from '../Sample Data/intraday';
 
 export const selectStock = ticker => {
   return {
-    type: 'STOCK_SELECTED',
+    type: 'SELECT_STOCK',
     payload: ticker
   };
 };

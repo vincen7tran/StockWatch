@@ -3,6 +3,13 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import { addStock } from '../actions';
 
+const container = {
+  padding: '5px 5px',
+  borderColor: '#0e0d0d',
+  borderBottom: 'solid 1px',
+  textAlign: 'center',
+};
+
 class AddStock extends React.Component {
   constructor(props) {
     super(props);
@@ -37,10 +44,12 @@ class AddStock extends React.Component {
     const { ticker } = this.state;
 
     return (
-      <form onSubmit={e => this.handleSubmit(e)}>
-        <input name="ticker" type="text" value={ticker} onChange={e => this.handleChange(e)} placeholder="Add Ticker Symbol"></input>
-        <button type="submit" >Add Stock</button>
-      </form>
+      <div style={container}>
+        <form onSubmit={e => this.handleSubmit(e)}>
+          <input name="ticker" type="text" value={ticker} onChange={e => this.handleChange(e)} placeholder="Add Ticker Symbol"></input>
+          <button type="submit" >Add Stock</button>
+        </form>
+      </div>
     );
   }
 }
