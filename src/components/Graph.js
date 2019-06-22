@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setEndDate, setData, setHover } from '../actions';
+import { selectStock, getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setEndDate, setData, setHover } from '../actions';
 
 const container = {
   display: 'block',
@@ -59,18 +59,28 @@ const axisStyle = {
 
 class Graph extends React.Component {
   componentDidMount() {
-    const { getIntraday, getDaily } = this.props;
+    const { user, selectStock } = this.props;
 
-    getIntraday('MSFT');
-    getDaily('MSFT');
+    if (user) {
+      const { stocks } = user;
+
+      selectStock(stocks[0]);
+    }
   }
 
   componentDidUpdate(prevProps) {
     const prevXMax = prevProps.xMax;
     const prevDaily = prevProps.daily;
-    const { daily, xMax, startDate, endDate } = this.props;
+    const prevStock = prevProps.selectedStock;
+    const { selectedStock, getIntraday, getDaily, daily, xMax, startDate, endDate } = this.props;
+    
+    if (selectedStock !== prevStock) {
+      getIntraday(selectedStock);
+      getDaily(selectedStock);
+    }
 
     if (xMax !== prevXMax) this.getMinAndMaxY(startDate, endDate);
+
     if (daily !== prevDaily) this.getMinAndMaxX();
   }
 
@@ -317,9 +327,10 @@ class Graph extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, endDate, data, hoverPoint } = state;
+  const { selectedStock, daily, intraday, xMin, xMax, yMin, yMax, startDate, endDate, data, hoverPoint, user } = state;
 
   return {
+    selectedStock,
     daily,
     intraday,
     xMin,
@@ -330,6 +341,7 @@ const mapStateToProps = (state) => {
     endDate,
     data,
     hoverPoint,
+    user
   };
 };
 
@@ -337,6 +349,7 @@ const mapDispatchToProps = dispatch => {
   return {
     dispatch,
     ...bindActionCreators({ 
+      selectStock,
       getIntraday,
       getDaily,
       setMinX,
