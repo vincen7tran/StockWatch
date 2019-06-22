@@ -63,11 +63,8 @@ class Graph extends React.Component {
   componentDidUpdate(prevProps) {
     const prevXMax = prevProps.xMax;
     const { xMax, startDate, endDate } = this.props;
-    console.log(xMax, prevXMax);
-    if (xMax !== prevXMax) {
-      console.log(1);
-      this.getMinAndMaxY(startDate, endDate);
-    }
+
+    if (xMax !== prevXMax) this.getMinAndMaxY(startDate, endDate);
   }
 
   handleMouseMove = (e) => {
