@@ -42,8 +42,21 @@ app.post('/users', async (req, res) => {
 });
 
 app.patch('/users', async (req, res) => {
-  console.log(req.body);
-  res.sendStatus(200);
+  const { user, ticker } = req.body;
+  const { email } = user;
+  let { stocks } = user;
+  stocks = [...stocks, ticker];
+  console.log(email, stocks);
+  try {
+    const result = await User.findOneAndUpdate({ email }, { stocks }, { upsert: true, rawResult: true });
+    const { value, lastErrorObject } = result;
+
+    if (lastErrorObject.updatedExisting) res.status(200).send(value);
+    else res.status(201).send(value);
+
+  } catch (e) {
+    res.status(400).send(e);
+  }
 });
 
 app.listen(PORT, () => {

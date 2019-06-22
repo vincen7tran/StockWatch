@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import AddStock from './AddStock';
+import StockList from './StockList';
 
 const flexContainer = {
   display: 'flex',
@@ -44,6 +45,7 @@ class UserCard extends React.Component {
             <h3 style={title}>{email}</h3>
           </header>
           <AddStock />
+          <StockList />
         </div>
       </div>
     )

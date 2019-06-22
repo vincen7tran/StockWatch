@@ -10,7 +10,7 @@ const user = {
   "__v": 0
 };
 
-export default (state = user, action) => {
+export default (state = null, action) => {
   switch (action.type) {
     case 'SET_USER':
       return action.payload;

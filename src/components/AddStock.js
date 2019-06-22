@@ -15,7 +15,7 @@ class AddStock extends React.Component {
   handleChange = (e) => {
     const { name, value } = e.target;
 
-    this.setState({ [name]: value });
+    this.setState({ [name]: value.toUpperCase() });
   }
 
   handleSubmit = async (e) => {
