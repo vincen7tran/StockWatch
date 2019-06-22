@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setData, setHover } from '../actions';
+import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setEndDate, setData, setHover } from '../actions';
 
 const container = {
   display: 'block',
@@ -60,6 +60,16 @@ class Graph extends React.Component {
     getDaily('MSFT');
   }
 
+  componentDidUpdate(prevProps) {
+    const prevXMax = prevProps.xMax;
+    const { xMax, startDate, endDate } = this.props;
+    console.log(xMax, prevXMax);
+    if (xMax !== prevXMax) {
+      console.log(1);
+      this.getMinAndMaxY(startDate, endDate);
+    }
+  }
+
   handleMouseMove = (e) => {
     const { data, setHover } = this.props;
     const el = document.getElementById('graphPath');
@@ -77,7 +87,7 @@ class Graph extends React.Component {
   }
 
   getMinAndMaxX = () => {
-    const { daily, setMinX, setMaxX, setStartDate, xMax } = this.props;
+    const { daily, setMinX, setMaxX, setStartDate, setEndDate } = this.props;
     const timeSeries = daily['Time Series (Daily)'];
     const today = moment(new Date()).format('YYYY-MM-DD');
     const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
@@ -90,17 +100,17 @@ class Graph extends React.Component {
     }
     
     setMinX(0);
-    setStartDate(today);
+    setStartDate(oneMonthAgo);
+    setEndDate(today);
     setMaxX(max - 1);
-    if (xMax) this.getMinAndMaxY(oneMonthAgo, today);
     
   }
 
-  getMinAndMaxY = (oneMonthAgo, today) => {
+  getMinAndMaxY = (startDate, endDate) => {
     const { setMinY, setMaxY, setData }  = this.props;
     const timeSeries = this.props.daily['Time Series (Daily)'];
-    const start = oneMonthAgo;
-    const end = today;
+    const start = startDate;
+    const end = endDate;
     const data = [];
     let current = start;
     let minY = Infinity;
@@ -113,14 +123,13 @@ class Graph extends React.Component {
 
         if (value < minY) minY = value;
         else if (value > maxY) maxY = value;
-
+        
         data.push({
           x,
           y: value,
           coords: this.getSvgX(x),
           date: current 
         });
-        
         x++;
       }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
@@ -241,7 +250,7 @@ class Graph extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, data, hoverPoint } = state;
+  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, endDate, data, hoverPoint } = state;
 
   return {
     daily,
@@ -251,6 +260,7 @@ const mapStateToProps = (state) => {
     yMin,
     yMax,
     startDate,
+    endDate,
     data,
     hoverPoint,
   };
@@ -267,6 +277,7 @@ const mapDispatchToProps = dispatch => {
       setMinY,
       setMaxY,
       setStartDate,
+      setEndDate,
       setData,
       setHover,
     }, dispatch)

@@ -33,6 +33,13 @@ export const setStartDate = date => {
   };
 };
 
+export const setEndDate = date => {
+  return {
+    type: 'SET_ENDDATE',
+    payload: date
+  };
+};
+
 export const setMinX = x => {
   return {
     type: 'SET_XMIN',
@@ -40,7 +47,7 @@ export const setMinX = x => {
   };
 };
 
-export const setMaxX = x  => {
+export const setMaxX = x => {
   return {
     type: 'SET_XMAX',
     payload: x
