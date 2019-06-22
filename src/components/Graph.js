@@ -62,9 +62,11 @@ class Graph extends React.Component {
 
   componentDidUpdate(prevProps) {
     const prevXMax = prevProps.xMax;
-    const { xMax, startDate, endDate } = this.props;
+    const prevDaily = prevProps.daily;
+    const { daily, xMax, startDate, endDate } = this.props;
 
     if (xMax !== prevXMax) this.getMinAndMaxY(startDate, endDate);
+    if (daily !== prevDaily) this.getMinAndMaxX();
   }
 
   handleMouseMove = (e) => {
@@ -183,6 +185,7 @@ class Graph extends React.Component {
 
   makeAxis = () => {
     const { xMin, xMax, yMin, yMax, hoverPoint } = this.props;
+    const color = { stroke: '#8c8c8e' };
 
     return (
       <g style={axisStyle}>
@@ -201,21 +204,68 @@ class Graph extends React.Component {
         {
           hoverPoint
           &&
-        <line
-          x1={hoverPoint.coords}
-          y1={this.getSvgY(yMin)}
-          x2={hoverPoint.coords}
-          y2={this.getSvgY(yMax)}
-        />
+          <line style={color}
+            x1={hoverPoint.coords}
+            y1={this.getSvgY(yMin)}
+            x2={hoverPoint.coords}
+            y2={this.getSvgY(yMax)}
+          />
+        }
+        {
+          hoverPoint 
+          &&
+          <circle cx={hoverPoint.coords} cy={this.getSvgY(hoverPoint.y)} r="4" stroke="black" stroke-width="2" fill="#21ce99" />
         }
       </g>
     );
   }
 
-  render() {
-    const { daily, data } = this.props;
+  makeHoverDate = () => {
+    const { hoverPoint } = this.props;
+    const date = moment(hoverPoint.date).format('MMM DD, YYYY');
 
-    if (daily && !data.length) this.getMinAndMaxX();
+    const hoverDate = {
+      position: 'absolute',
+      bottom: '100%',
+      left: `${hoverPoint.coords}px`
+    };
+
+    const center = {
+      position: 'relative',
+      left: '-50%'
+    };
+
+    const text = {
+      opacity: '1',
+      color: '#8c8c8e',
+      marginBottom: '6px',
+      textTransform: 'uppercase',
+      whiteSpace: 'nowrap',
+      fontSize: '13px',
+      fontWeight: '400',
+      lineHeight: '19px',
+      letterSpacing: '0.25px'
+    };
+
+    return (
+      <div style={hoverDate}>
+        <div style={center}>
+          <span style={text}>
+            {date}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  getPrice = () => {
+
+  }
+
+  render() {
+    const { daily, data, hoverPoint } = this.props;
+
+    //const timeSeries = this.props.daily['Time Series (Daily)'];
 
     return (
       <div style={container}>
@@ -226,10 +276,11 @@ class Graph extends React.Component {
           <section style={graphSection}>
             <header style={priceHeader}>
               <h1 style={priceH1}>
-                $123.12
+                {(hoverPoint && new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(hoverPoint.y)) || '$123'} 
               </h1>
             </header>
             <div style={graphDiv}>
+              {hoverPoint && this.makeHoverDate()}
               {
                 data.length
                 &&
