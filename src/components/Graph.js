@@ -43,6 +43,10 @@ const graphDiv = {
 };
 
 const svgStyle = {
+  overflow: 'visible',
+};
+
+const pathStyle = {
   stroke: '#21ce99',
   strokeWidth: '2',
   fill: 'none',
@@ -136,7 +140,7 @@ class Graph extends React.Component {
 
     setData(data);
     setMinY(parseFloat(minY));
-    setMaxY(parseFloat(maxY));
+    setMaxY(parseFloat(maxY) * 1.005);
 
     return {
       min: minY,
@@ -179,7 +183,7 @@ class Graph extends React.Component {
     });
 
     return (
-      <path id="graphPath" d={pathD} style={svgStyle} width="676px" height="196px" />
+      <path id="graphPath" d={pathD} style={pathStyle} width="676px" height="196px" />
     );
   }
 
@@ -284,7 +288,13 @@ class Graph extends React.Component {
               {
                 data.length
                 &&
-                <svg id="graph" onMouseLeave={this.clearHover} onMouseMove={e => this.handleMouseMove(e)} viewBox={`0 0 676 196`}>
+                <svg 
+                  id="graph"
+                  style={svgStyle}
+                  onMouseLeave={this.clearHover}
+                  onMouseMove={e => this.handleMouseMove(e)}
+                  viewBox={`0 0 676 196`}
+                >
                   {this.makePath()}
                   {this.makeAxis()}
                 </svg>
