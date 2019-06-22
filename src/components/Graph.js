@@ -97,7 +97,7 @@ class Graph extends React.Component {
     }
     console.log(x);
     setData(data);
-    setMaxX(x);
+    setMaxX(x - 1);
     setMinY(parseFloat(minY));
     setMaxY(parseFloat(maxY));
 
