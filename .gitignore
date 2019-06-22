@@ -58,3 +58,4 @@ yarn-debug.log*
 yarn-error.log*
 
 /src/actions/API_KEY.js
+/db/MONGO_URL.js
