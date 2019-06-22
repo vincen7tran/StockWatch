@@ -60,27 +60,20 @@ class Graph extends React.Component {
   }
 
   getMinAndMaxX = () => {
-    const { setMinX, setMaxX, setStartDate } = this.props;
+    const { setMinX, setStartDate } = this.props;
     const today = moment(new Date()).format('YYYY-MM-DD');
     const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
-    const max = moment(today, 'YYYY-MM-DD').diff(moment(oneMonthAgo, 'YYYY-MM-DD'), 'days');
 
     setMinX(0);
-    setMaxX(max);
     setStartDate(today);
     this.getMinAndMaxY(oneMonthAgo, today);
-    
-    return {
-      minX: 0,
-      maxX: max,
-    };
   }
 
-  getMinAndMaxY = (minX, maxX) => {
-    const { setMinY, setMaxY, setData }  = this.props;
+  getMinAndMaxY = (oneMonthAgo, today) => {
+    const { setMinY, setMaxY, setMaxX, setData }  = this.props;
     const timeSeries = this.props.daily['Time Series (Daily)'];
-    const start = minX;
-    const end = maxX;
+    const start = oneMonthAgo;
+    const end = today;
     const data = [];
     let current = start;
     let minY = Infinity;
@@ -102,8 +95,9 @@ class Graph extends React.Component {
       }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
-
+    console.log(x);
     setData(data);
+    setMaxX(x);
     setMinY(parseFloat(minY));
     setMaxY(parseFloat(maxY));
 
@@ -120,9 +114,10 @@ class Graph extends React.Component {
   };
 
   getSvgY = y => {
-    const { yMax } = this.props;
+    const { yMin, yMax } = this.props;
     const height = 196;
-    return height - (y / yMax * height);
+    const heightAdjusted = height / (1 - yMin / yMax);
+    return heightAdjusted - (y / yMax) * heightAdjusted;
   };
 
   makePath = () => {
@@ -135,12 +130,14 @@ class Graph extends React.Component {
     });
 
     return (
-      <path d={pathD} style={svgStyle} width="676" height="196" />
+      <path d={pathD} style={svgStyle} width="676px" height="196px" />
     );
   };
 
   makeAxis = () => {
     const { xMin, xMax, yMin, yMax } = this.props;
+    const height = 196;
+    const width = 676;
 
     return (
       <g style={axisStyle}>
