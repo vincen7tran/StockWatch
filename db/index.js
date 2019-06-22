@@ -5,6 +5,7 @@ mongoose.connect(MONGO_URL, {
   dbName: 'RH',
   useNewUrlParser: true,
   useCreateIndex: true,
+  useFindAndModify: false,
 }, (err) => {
   if (err) return console.log('MongoDB Connection Error:', err);
   console.log('MongoDB Connected!');

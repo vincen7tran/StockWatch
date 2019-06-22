@@ -10,6 +10,7 @@ import startDateReducer from './startDateReducer';
 import dataReducer from './dataReducer';
 import hoverReducer from './hoverReducer';
 import endDateReducer from './endDateReducer';
+import setUserReducer from './setUserReducer';
 
 export default combineReducers({
   intraday: intradayReducer,
@@ -23,4 +24,5 @@ export default combineReducers({
   data: dataReducer,
   hoverPoint: hoverReducer,
   endDate: endDateReducer,
+  user: setUserReducer
 });

@@ -1,17 +1,57 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import Login from './Login';
+import UserCard from './UserCard';
 import Graph from './Graph';
 
 const bodyStyle = {
   fontFamily: '"DIN Pro", -apple-system, BlinkMacSystemFont, sans-serif',
-  margin: '0 15%'
+  width: '100%',
 };
 
-const App = () => {
-  return (
-    <div style={bodyStyle}>
-      <Graph />
-    </div>
-  );
+const container = {
+  width: '1024px',
+  margin: '0 auto',
+  paddingTop: '36px'  
 };
 
-export default App;
+const flex = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  margin: '0 -6px',
+};
+
+const App = (props) => {
+  const { user } = props;
+
+  if (!user) {
+    return (
+      <Login />
+    );
+  }
+
+  else {
+    return (
+      <div style={bodyStyle}>
+        <div style={container}>
+          <div style={flex}>
+            <UserCard />
+            <Graph />
+          </div>
+        </div>
+      </div>
+    );
+  }
+};
+
+const mapStateToProps = state => {
+  const { user } = state;
+
+  return {
+    user
+  };
+};
+
+export default connect(mapStateToProps)(App);
+
+

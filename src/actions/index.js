@@ -1,4 +1,4 @@
-// import axios from 'axios';
+import axios from 'axios';
 // import API_KEY from './API_KEY';
 import daily from '../Sample Data/daily';
 import intraday from '../Sample Data/intraday';
@@ -8,6 +8,20 @@ import intraday from '../Sample Data/intraday';
 export const selectStock = ticker => {
   return {
     type: 'STOCK_SELECTED',
+    payload: ticker
+  };
+};
+
+export const setUser = email => async dispatch => {
+  const response = await axios.get(`http://localhost:8080/users?email=${email}`);
+  const { data } = response;
+
+  dispatch({ type: 'SET_USER', payload: data });
+};
+
+export const addStock = ticker => {
+  return {
+    type: 'ADD_STOCK',
     payload: ticker
   };
 };

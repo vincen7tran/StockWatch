@@ -8,6 +8,7 @@ const container = {
   display: 'block',
   paddingLeft: '6px',
   paddingRight: '6px',
+  flex: '0 0 66.66667%'
 };
 
 const stockTitle = {
@@ -142,7 +143,7 @@ class Graph extends React.Component {
 
     setData(data);
     setMinY(parseFloat(minY));
-    setMaxY(parseFloat(maxY) * 1.005);
+    setMaxY(parseFloat(maxY) * 1.0025);
 
     return {
       min: minY,
@@ -220,7 +221,7 @@ class Graph extends React.Component {
         {
           hoverPoint 
           &&
-          <circle cx={hoverPoint.coords} cy={this.getSvgY(hoverPoint.y)} r="4" stroke="black" stroke-width="2" fill="#21ce99" />
+          <circle cx={hoverPoint.coords} cy={this.getSvgY(hoverPoint.y)} r="4" stroke="black" strokeWidth="2" fill="#21ce99" />
         }
       </g>
     );
