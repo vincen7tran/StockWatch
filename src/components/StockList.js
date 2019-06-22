@@ -12,7 +12,10 @@ const span = {
 
 class StockList extends React.Component {
   handleClick = (e) => {
-    console.log(e.target.textContent);
+    const { selectStock } = this.props;
+    const { textContent } = e.target;
+
+    selectStock(textContent);
   }
 
   render() {
@@ -41,4 +44,6 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps)(StockList);
+export default connect(mapStateToProps, {
+  selectStock
+})(StockList);

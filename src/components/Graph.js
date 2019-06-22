@@ -288,12 +288,12 @@ class Graph extends React.Component {
   }
 
   render() {
-    const { data, hoverPoint, endDate } = this.props;
+    const { data, hoverPoint, endDate, selectedStock } = this.props;
 
     return (
       <div style={container}>
         <header>
-          <h1 style={stockTitle}>MSFT</h1>
+          <h1 style={stockTitle}>{selectedStock}</h1>
         </header>
         <div>
           <section style={graphSection}>
