@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setData } from '../actions';
+import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setData, setHover } from '../actions';
 
 const container = {
   display: 'block',
@@ -59,18 +59,51 @@ class Graph extends React.Component {
     getDaily('MSFT');
   }
 
+  handleMouseMove = (e) => {
+    const { data, setHover } = this.props;
+    const el = document.getElementById('graphPath');
+    const coord = el.getPointAtLength(e.clientX).x;
+    let closest = data[0];
+    
+    for (let point of data) {
+      const currentDiff = coord - closest.coords;
+      const checkDiff = Math.abs(coord - point.coords);
+
+      if (checkDiff < currentDiff) closest = point;
+    }
+
+    setHover(closest);
+  }
+
+  clearHover = () => {
+    const { setHover } = this.props;
+    
+    setHover(null);
+  }
+
   getMinAndMaxX = () => {
-    const { setMinX, setStartDate } = this.props;
+    const { daily, setMinX, setMaxX, setStartDate, xMax } = this.props;
+    const timeSeries = daily['Time Series (Daily)'];
     const today = moment(new Date()).format('YYYY-MM-DD');
     const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
+    let max = 0;
+    let current = oneMonthAgo;
+
+    while (current < today) {
+      if (timeSeries[current]) max++;
+      current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
+    }
+    
 
     setMinX(0);
+    setMaxX(max);
     setStartDate(today);
-    this.getMinAndMaxY(oneMonthAgo, today);
+    if (xMax) this.getMinAndMaxY(oneMonthAgo, today);
+    
   }
 
   getMinAndMaxY = (oneMonthAgo, today) => {
-    const { setMinY, setMaxY, setMaxX, setData }  = this.props;
+    const { setMinY, setMaxY, setData }  = this.props;
     const timeSeries = this.props.daily['Time Series (Daily)'];
     const start = oneMonthAgo;
     const end = today;
@@ -89,15 +122,15 @@ class Graph extends React.Component {
         data.push({
           x,
           y: value,
+          coords: this.getSvgX(x),
           date: current 
         });
         x++;
       }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
-    console.log(x);
+
     setData(data);
-    setMaxX(x - 1);
     setMinY(parseFloat(minY));
     setMaxY(parseFloat(maxY));
 
@@ -110,34 +143,37 @@ class Graph extends React.Component {
   getSvgX = x => {
     const { xMax } = this.props;
     const width = 676;
+
     return (x / xMax * width);
-  };
+  }
 
   getSvgY = y => {
     const { yMin, yMax } = this.props;
     const height = 196;
     const heightAdjusted = height / (1 - yMin / yMax);
+
     return heightAdjusted - (y / yMax) * heightAdjusted;
-  };
+  }
 
   makePath = () => {
     const { data } = this.props;
 
     let pathD = `M ${this.getSvgX(data[0].x)} ${this.getSvgY(data[0].y)}`;
 
-    pathD += data.map((point, i) => {
-      return `L ${this.getSvgX(point.x)} ${this.getSvgY(point.y)}`;
+    pathD += data.map(point => {
+      const x = this.getSvgX(point.x);
+      const y = this.getSvgY(point.y);
+      
+      return `L ${x} ${y}`;
     });
 
     return (
-      <path d={pathD} style={svgStyle} width="676px" height="196px" />
+      <path id="graphPath" d={pathD} style={svgStyle} width="676px" height="196px" />
     );
-  };
+  }
 
   makeAxis = () => {
     const { xMin, xMax, yMin, yMax } = this.props;
-    const height = 196;
-    const width = 676;
 
     return (
       <g style={axisStyle}>
@@ -154,8 +190,8 @@ class Graph extends React.Component {
           y2={this.getSvgY(yMax)}
         />
       </g>
-    )
-  };
+    );
+  }
 
   render() {
     const { daily, data } = this.props;
@@ -177,7 +213,7 @@ class Graph extends React.Component {
             <div style={graphDiv}>
               {data.length
               &&
-              <svg viewBox={`0 0 676 196`}>
+              <svg id="graph" onMouseLeave={this.clearHover} onMouseMove={e => this.handleMouseMove(e)} viewBox={`0 0 676 196`}>
                 {this.makePath()}
                 {this.makeAxis()}
               </svg>
@@ -191,7 +227,7 @@ class Graph extends React.Component {
 }
 
 const mapStateToProps = state => {
-  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, data } = state;
+  const { daily, intraday, xMin, xMax, yMin, yMax, startDate, data, hoverPoint } = state;
 
   return {
     daily,
@@ -202,6 +238,7 @@ const mapStateToProps = state => {
     yMax,
     startDate,
     data,
+    hoverPoint,
   };
 };
 
@@ -214,4 +251,5 @@ export default connect(mapStateToProps, {
   setMaxY,
   setStartDate,
   setData,
+  setHover,
 })(Graph);

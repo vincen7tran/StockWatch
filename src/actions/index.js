@@ -19,6 +19,13 @@ export const setData = data => {
   };
 };
 
+export const setHover = point => {
+  return {
+    type: 'HOVER_POINT',
+    payload: point
+  };
+};
+
 export const setStartDate = date => {
   return {
     type: 'SET_STARTDATE',
@@ -33,11 +40,12 @@ export const setMinX = x => {
   };
 };
 
-export const setMaxX = x => {
-  return {
+export const setMaxX = x => dispatch => {
+  dispatch({
     type: 'SET_XMAX',
     payload: x
-  };
+  });
+  return Promise.resolve()
 };
 
 export const setMinY = y => {
