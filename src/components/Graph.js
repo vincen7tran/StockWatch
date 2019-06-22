@@ -48,7 +48,7 @@ const svgStyle = {
 
 const pathStyle = {
   stroke: '#21ce99',
-  strokeWidth: '2',
+  strokeWidth: '2.5',
   fill: 'none',
 };
 
@@ -80,7 +80,7 @@ class Graph extends React.Component {
     const coord = e.clientX - rect.x;
     const x = coord < 0 ? 0 : Math.round(this.getX(coord));
 
-    setHover(data[x]);
+    if (data[x]) setHover(data[x]);
   }
 
   clearHover = () => {
@@ -101,17 +101,19 @@ class Graph extends React.Component {
       if (timeSeries[current]) max++;
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
+
+    const endDate = moment(current, 'YYYY-MM-DD').subtract(1, 'day').format('YYYY-MM-DD');
     
     setMinX(0);
     setStartDate(oneMonthAgo);
-    setEndDate(today);
+    setEndDate(endDate);
     setMaxX(max - 1);
     
   }
 
   getMinAndMaxY = (startDate, endDate) => {
-    const { setMinY, setMaxY, setData }  = this.props;
-    const timeSeries = this.props.daily['Time Series (Daily)'];
+    const { daily, setMinY, setMaxY, setData }  = this.props;
+    const timeSeries = daily['Time Series (Daily)'];
     const start = startDate;
     const end = endDate;
     const data = [];
@@ -263,13 +265,19 @@ class Graph extends React.Component {
   }
 
   getPrice = () => {
+    const { daily, hoverPoint, endDate } = this.props;
+    const timeSeries = daily['Time Series (Daily)'];
+    
+    const price =
+      hoverPoint ?
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(hoverPoint.y) :
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(timeSeries[endDate]['4. close']);
 
+    return price;
   }
 
   render() {
-    const { daily, data, hoverPoint } = this.props;
-
-    //const timeSeries = this.props.daily['Time Series (Daily)'];
+    const { data, hoverPoint, endDate } = this.props;
 
     return (
       <div style={container}>
@@ -280,7 +288,7 @@ class Graph extends React.Component {
           <section style={graphSection}>
             <header style={priceHeader}>
               <h1 style={priceH1}>
-                {(hoverPoint && new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(hoverPoint.y)) || '$123'} 
+                {endDate && this.getPrice()} 
               </h1>
             </header>
             <div style={graphDiv}>
