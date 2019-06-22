@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setData, setHover } from '../actions';
 
 const container = {
@@ -88,10 +89,9 @@ class Graph extends React.Component {
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
     
-
     setMinX(0);
-    setMaxX(max - 1);
     setStartDate(today);
+    setMaxX(max - 1);
     if (xMax) this.getMinAndMaxY(oneMonthAgo, today);
     
   }
@@ -113,12 +113,14 @@ class Graph extends React.Component {
 
         if (value < minY) minY = value;
         else if (value > maxY) maxY = value;
+
         data.push({
           x,
           y: value,
           coords: this.getSvgX(x),
           date: current 
         });
+        
         x++;
       }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
@@ -238,7 +240,7 @@ class Graph extends React.Component {
   };
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   const { daily, intraday, xMin, xMax, yMin, yMax, startDate, data, hoverPoint } = state;
 
   return {
@@ -254,14 +256,21 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, { 
-  getIntraday,
-  getDaily,
-  setMinX,
-  setMaxX,
-  setMinY,
-  setMaxY,
-  setStartDate,
-  setData,
-  setHover,
-})(Graph);
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+    ...bindActionCreators({ 
+      getIntraday,
+      getDaily,
+      setMinX,
+      setMaxX,
+      setMinY,
+      setMaxY,
+      setStartDate,
+      setData,
+      setHover,
+    }, dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Graph);

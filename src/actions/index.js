@@ -40,12 +40,11 @@ export const setMinX = x => {
   };
 };
 
-export const setMaxX = x => dispatch => {
-  dispatch({
+export const setMaxX = x  => {
+  return {
     type: 'SET_XMAX',
     payload: x
-  });
-  return Promise.resolve()
+  };
 };
 
 export const setMinY = y => {
