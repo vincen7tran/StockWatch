@@ -79,9 +79,10 @@ class Graph extends React.Component {
       getDaily(selectedStock);
     }
 
-    if (xMax !== prevXMax) this.getMinAndMaxY(startDate, endDate);
-
     if (daily !== prevDaily) this.getMinAndMaxX();
+
+    if (xMax !== prevXMax || daily !== prevDaily) this.getMinAndMaxY(startDate, endDate);
+
   }
 
   handleMouseMove = (e) => {
@@ -295,7 +296,7 @@ class Graph extends React.Component {
     return (
       <div style={container}>
         <header>
-          <h1 style={stockTitle}>{selectedStock}</h1>
+          <h1 style={stockTitle}>{selectedStock ? selectedStock: 'Add a stock to track!'}</h1>
         </header>
         <div>
           <section style={graphSection}>

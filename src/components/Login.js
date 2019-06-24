@@ -15,6 +15,10 @@ const centered = {
   justifyContent: 'center',
 };
 
+const input = {
+  width: '15%'
+};
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -44,7 +48,7 @@ class Login extends React.Component {
     return (
       <form style={loginStyle} onSubmit={e => this.handleSubmit(e)}>
         <div style={centered}>
-          <input name="email" type="email" placeholder="email" value={email} onChange={this.handleChange}></input>
+          <input style={input} name="email" type="email" placeholder="email" value={email} onChange={this.handleChange}></input>
           <button type="submit">Login</button>
         </div>
       </form>
