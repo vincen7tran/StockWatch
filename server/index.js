@@ -22,7 +22,7 @@ app.get('/users', async (req, res) => {
   try {
     const result = await User.findOneAndUpdate({ email }, { email }, { upsert: true, rawResult: true, new: true });
     const { value, lastErrorObject } = result;
-    console.log(result);
+
     if (lastErrorObject.updatedExisting) res.status(200).send(value);
     else res.status(201).send(value);
 
@@ -47,10 +47,8 @@ app.post('/users', async (req, res) => {
 });
 
 app.patch('/users', async (req, res) => {
-  const { user, ticker } = req.body;
+  const { user, stocks } = req.body;
   const { email } = user;
-  let { stocks } = user;
-  stocks = [...stocks, ticker];
 
   try {
     const result = await User.findOneAndUpdate({ email }, { stocks }, { upsert: true, rawResult: true });

@@ -30,15 +30,17 @@ class AddStock extends React.Component {
 
     const { user, addStock, selectStock } = this.props;
     const { ticker } = this.state
+    let { stocks } = user;
     
     addStock(ticker);
     selectStock(ticker);
 
+    stocks = [...stocks, ticker];
+
     await axios.patch('/users', {
       user,
-      ticker
+      stocks
     });
-
   }
 
   render() {

@@ -1,9 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { selectStock } from '../actions';
+import { deleteStock, selectStock } from '../actions';
+import axios from 'axios';
 
 const container = {
-  textAlign: 'center'
+  display: 'flex',
+  justifyContent: 'space-between',
+  textAlign: 'center',
+  padding: '2px 60px'
 };
 
 const span = {
@@ -18,6 +22,21 @@ class StockList extends React.Component {
     selectStock(textContent);
   }
 
+  handleDelete = (e) => {
+    const { deleteStock, user } = this.props;
+    const { name } = e.target;
+    let { stocks } = user;
+
+    stocks = stocks.filter(stock => stock !== name);
+
+    deleteStock(name);
+
+    axios.patch('/users', {
+      user,
+      stocks
+    });
+  }
+
   render() {
     const { stocks } = this.props.user;
     const stock = stocks.map(stock => {
@@ -26,6 +45,7 @@ class StockList extends React.Component {
           <span name={stock} style={span} onClick={(e) => this.handleClick(e)}>
             {stock}
           </span>
+          <button name={stock} type="button" onClick={e => this.handleDelete(e)}>X</button>
         </div>
       );
     });
@@ -45,5 +65,6 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps, {
-  selectStock
+  selectStock,
+  deleteStock
 })(StockList);

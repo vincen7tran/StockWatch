@@ -16,6 +16,8 @@ export default (state = null, action) => {
       return action.payload;
     case 'ADD_STOCK':
       return { ...state, stocks: [...state.stocks, action.payload] };
+    case 'DELETE_STOCK':
+        return {...state, stocks: state.stocks.filter(stock => stock !== action.payload) };
     default:
       return state;
   };
