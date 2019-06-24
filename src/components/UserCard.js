@@ -21,7 +21,7 @@ const header = {
   borderBottom: 'solid 1px',
   padding: '4px 24px 0',
   flex: '0, 0, 27.77778%',
-  height: '44px',
+  height: '26px',
 };
 
 const title = {

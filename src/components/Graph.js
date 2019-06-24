@@ -3,6 +3,7 @@ import moment from 'moment';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { selectStock, getIntraday, getDaily, setMinX, setMaxX, setMinY, setMaxY, setStartDate, setEndDate, setData, setHover } from '../actions';
+import Nav from './Nav';
 
 const container = {
   display: 'block',
@@ -21,7 +22,7 @@ const stockTitle = {
 
 const graphSection = {
   width: '676px',
-  marginBottom: '44px',
+  marginBottom: '22px',
 }
 
 const priceHeader = {
@@ -47,12 +48,6 @@ const svgStyle = {
   overflow: 'visible',
 };
 
-const pathStyle = {
-  stroke: '#21ce99',
-  strokeWidth: '2.5',
-  fill: 'none',
-};
-
 const axisStyle = {
   stroke: '#1b1b1d'
 };
@@ -72,14 +67,15 @@ class Graph extends React.Component {
     const prevXMax = prevProps.xMax;
     const prevDaily = prevProps.daily;
     const prevStock = prevProps.selectedStock;
-    const { selectedStock, getIntraday, getDaily, daily, xMax, startDate, endDate } = this.props;
+    const prevDuration = prevProps.duration;
+    const { selectedStock, duration, getIntraday, getDaily, daily, xMax, startDate, endDate } = this.props;
     
     if (selectedStock !== prevStock) {
       getIntraday(selectedStock);
       getDaily(selectedStock);
     }
 
-    if (daily !== prevDaily) this.getMinAndMaxX();
+    if (daily !== prevDaily || duration !== prevDuration) this.getMinAndMaxX();
 
     if (xMax !== prevXMax || daily !== prevDaily) this.getMinAndMaxY(startDate, endDate);
 
@@ -102,13 +98,19 @@ class Graph extends React.Component {
   }
 
   getMinAndMaxX = () => {
-    const { daily, setMinX, setMaxX, setStartDate, setEndDate } = this.props;
+    const { daily, duration, setMinX, setMaxX, setStartDate, setEndDate } = this.props;
     const timeSeries = daily['Time Series (Daily)'];
     const today = moment(new Date()).format('YYYY-MM-DD');
-    const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
+
+    let startDate;
+    if (duration === '1M') startDate = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
+    else if (duration === '6M') startDate = moment(today, 'YYYY-MM-DD').subtract(6, 'month').format('YYYY-MM-DD');
+    else if (duration ==='1Y') startDate = moment(today, 'YYYY-MM-DD').subtract(1, 'year').format('YYYY-MM-DD');
+    else if (duration ==='3Y') startDate = moment(today, 'YYYY-MM-DD').subtract(3, 'year').format('YYYY-MM-DD');
+    
     let max = 0;
-    let current = oneMonthAgo;
-    let endDate
+    let current = startDate;
+    let endDate;
 
     while (current < today) {
       if (timeSeries[current]) {
@@ -119,7 +121,7 @@ class Graph extends React.Component {
     }
     
     setMinX(0);
-    setStartDate(oneMonthAgo);
+    setStartDate(startDate);
     setEndDate(endDate);
     setMaxX(max - 1);
     
@@ -136,11 +138,11 @@ class Graph extends React.Component {
     let maxY = -Infinity;
     let x = 0;
 
-    while (current < end) {
+    while (current <= end) {
       if (timeSeries[current]) {
-        const value = timeSeries[current]['4. close'];
-
-        if (value < minY) minY = value;
+        const value = parseFloat(timeSeries[current]['4. close']);
+       
+        if (value <= minY) minY = value;
         else if (value > maxY) maxY = value;
         
         data.push({
@@ -188,6 +190,12 @@ class Graph extends React.Component {
 
   makePath = () => {
     const { data } = this.props;
+    const pathStyle = {
+      strokeWidth: '2.5',
+      fill: 'none',
+    };
+    
+    pathStyle.stroke = data[data.length - 1].y > data[0].y ? '#21ce99': '#f45351';
 
     let pathD = `M ${this.getSvgX(data[0].x)} ${this.getSvgY(data[0].y)}`;
 
@@ -324,16 +332,18 @@ class Graph extends React.Component {
             </div>
           </section>
         </div>
+        <Nav />
       </div>
     );
   };
 }
 
 const mapStateToProps = (state) => {
-  const { selectedStock, daily, intraday, xMin, xMax, yMin, yMax, startDate, endDate, data, hoverPoint, user } = state;
+  const { selectedStock, duration, daily, intraday, xMin, xMax, yMin, yMax, startDate, endDate, data, hoverPoint, user } = state;
 
   return {
     selectedStock,
+    duration,
     daily,
     intraday,
     xMin,

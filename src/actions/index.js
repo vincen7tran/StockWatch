@@ -12,6 +12,13 @@ export const selectStock = ticker => {
   };
 };
 
+export const setDuration = duration => {
+  return {
+    type: 'SET_DURATION',
+    payload: duration
+  };
+};
+
 export const setUser = email => async dispatch => {
   const response = await axios.get(`http://localhost:8080/users?email=${email}`);
   const { data } = response;

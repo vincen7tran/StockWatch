@@ -18,7 +18,7 @@ app.get('/', function (req, res) {
 
 app.get('/users', async (req, res) => {
   const { email }  = req.query;
-    console.log(email);
+  
   try {
     const result = await User.findOneAndUpdate({ email }, { email }, { upsert: true, rawResult: true, new: true });
     const { value, lastErrorObject } = result;
