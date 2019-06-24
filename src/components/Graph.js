@@ -71,7 +71,7 @@ class Graph extends React.Component {
     const { selectedStock, duration, getIntraday, getDaily, daily, xMax, startDate, endDate } = this.props;
     
     if (selectedStock !== prevStock) {
-      getIntraday(selectedStock);
+      // getIntraday(selectedStock);
       getDaily(selectedStock);
     }
 
@@ -99,14 +99,14 @@ class Graph extends React.Component {
 
   getMinAndMaxX = () => {
     const { daily, duration, setMinX, setMaxX, setStartDate, setEndDate } = this.props;
+    const { interval, unit } = duration;
     const timeSeries = daily['Time Series (Daily)'];
     const today = moment(new Date()).format('YYYY-MM-DD');
 
     let startDate;
-    if (duration === '1M') startDate = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
-    else if (duration === '6M') startDate = moment(today, 'YYYY-MM-DD').subtract(6, 'month').format('YYYY-MM-DD');
-    else if (duration ==='1Y') startDate = moment(today, 'YYYY-MM-DD').subtract(1, 'year').format('YYYY-MM-DD');
-    else if (duration ==='3Y') startDate = moment(today, 'YYYY-MM-DD').subtract(3, 'year').format('YYYY-MM-DD');
+    if (unit === 'D') startDate = moment(today, 'YYYY-MM-DD').subtract(interval, 'day').format('HH:MM A, MMM DD');
+    else if (unit === 'M') startDate = moment(today, 'YYYY-MM-DD').subtract(interval, 'month').format('YYYY-MM-DD');
+    else if (unit === 'Y') startDate = moment(today, 'YYYY-MM-DD').subtract(interval, 'year').format('YYYY-MM-DD');
     
     let max = 0;
     let current = startDate;
@@ -117,7 +117,8 @@ class Graph extends React.Component {
         max++;
         endDate = current;
       }
-      current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
+      if (unit !== 'D') current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
+      else current = moment(current, 'YYYY-MM-DD').add(5, 'minute').format('YYYY-MM-DD');
     }
     
     setMinX(0);
