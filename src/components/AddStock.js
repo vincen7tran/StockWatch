@@ -1,7 +1,7 @@
 import React from 'react';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { addStock } from '../actions';
+import { addStock, selectStock } from '../actions';
 
 const container = {
   padding: '5px 5px',
@@ -28,10 +28,11 @@ class AddStock extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { user, addStock } = this.props;
+    const { user, addStock, selectStock } = this.props;
     const { ticker } = this.state
     
     addStock(ticker);
+    selectStock(ticker);
 
     await axios.patch('/users', {
       user,
@@ -63,5 +64,6 @@ const mapStateToProps = state => {
 };
 
 export default connect(mapStateToProps, {
-  addStock
+  addStock,
+  selectStock
 })(AddStock);

@@ -2,6 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { setUser } from '../actions';
 
+const loginStyle = {
+  position: 'absolute',
+  width: '100%',
+  margin: 'auto',
+  top: '50%',
+};
+
+const centered = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -29,9 +42,11 @@ class Login extends React.Component {
     const { email } = this.state;
 
     return (
-      <form onSubmit={e => this.handleSubmit(e)}>
-        <input name="email" type="email" placeholder="email" value={email} onChange={this.handleChange}></input>
-        <button type="submit">Login</button>
+      <form style={loginStyle} onSubmit={e => this.handleSubmit(e)}>
+        <div style={centered}>
+          <input name="email" type="email" placeholder="email" value={email} onChange={this.handleChange}></input>
+          <button type="submit">Login</button>
+        </div>
       </form>
     );
   }

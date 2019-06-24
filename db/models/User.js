@@ -8,6 +8,7 @@ const User = mongoose.model('User', {
   },
   stocks: {
     type: Array,
+    default: [],
   }
 });
 

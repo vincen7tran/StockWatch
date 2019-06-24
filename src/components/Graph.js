@@ -63,8 +63,8 @@ class Graph extends React.Component {
 
     if (user) {
       const { stocks } = user;
-
-      selectStock(stocks[0]);
+      
+      if (stocks[0]) selectStock(stocks[0]);
     }
   }
 
@@ -301,13 +301,13 @@ class Graph extends React.Component {
           <section style={graphSection}>
             <header style={priceHeader}>
               <h1 style={priceH1}>
-                {endDate && this.getPrice()} 
+                {endDate && !!selectedStock && this.getPrice()} 
               </h1>
             </header>
             <div style={graphDiv}>
-              {hoverPoint && this.makeHoverDate()}
+              {!!hoverPoint && this.makeHoverDate()}
               {
-                data.length
+                !!data.length
                 &&
                 <svg 
                   id="graph"
