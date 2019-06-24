@@ -107,13 +107,15 @@ class Graph extends React.Component {
     const oneMonthAgo = moment(today, 'YYYY-MM-DD').subtract(1, 'month').format('YYYY-MM-DD');
     let max = 0;
     let current = oneMonthAgo;
+    let endDate
 
     while (current < today) {
-      if (timeSeries[current]) max++;
+      if (timeSeries[current]) {
+        max++;
+        endDate = current;
+      }
       current = moment(current, 'YYYY-MM-DD').add(1, 'day').format('YYYY-MM-DD');
     }
-
-    const endDate = moment(current, 'YYYY-MM-DD').subtract(1, 'day').format('YYYY-MM-DD');
     
     setMinX(0);
     setStartDate(oneMonthAgo);

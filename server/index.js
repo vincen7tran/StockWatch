@@ -18,9 +18,14 @@ app.get('/', function (req, res) {
 
 app.get('/users', async (req, res) => {
   const { email }  = req.query;
+    console.log(email);
   try {
-    const user = await User.findOne({ email });
-    res.status(200).send(user);
+    const result = await User.findOneAndUpdate({ email }, { email }, { upsert: true, rawResult: true, new: true });
+    const { value, lastErrorObject } = result;
+    console.log(result);
+    if (lastErrorObject.updatedExisting) res.status(200).send(value);
+    else res.status(201).send(value);
+
   } catch (e) {
     res.status(400).send(e);
   }
@@ -46,7 +51,7 @@ app.patch('/users', async (req, res) => {
   const { email } = user;
   let { stocks } = user;
   stocks = [...stocks, ticker];
-  console.log(email, stocks);
+
   try {
     const result = await User.findOneAndUpdate({ email }, { stocks }, { upsert: true, rawResult: true });
     const { value, lastErrorObject } = result;
